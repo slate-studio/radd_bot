@@ -4,9 +4,11 @@
 
 Run following services locally:
 
-> foreman start
-> ngrok 5000
 > redis-server
+
+> foreman start
+
+> ngrok 5000
 
 Save ngrok `https` endpoint to `.env` file:
 
