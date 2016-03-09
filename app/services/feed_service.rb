@@ -9,7 +9,16 @@ class FeedService
   def pull_and_send!
     Feed.all.each do |f|
       url = f.url
-      ff  = Feedjira::Feed.fetch_and_parse(url)
+
+      begin
+        ff = Feedjira::Feed.fetch_and_parse(url)
+
+      rescue Feedjira::NoParserAvailable
+        ap 'No valid parser for XML.'
+        ap f.url
+        next
+
+      end
 
       new_posts = ff.entries.select do |e|
         e.published > f.updated_at

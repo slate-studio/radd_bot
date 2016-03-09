@@ -16,6 +16,6 @@ Save ngrok `https` endpoint to `.env` file:
 
 Generate Telegram bot and add token to `.env` file using `TELEGRAM_BOT_API_TOKEN` variable.
 
-To change/set Webhook address user rake command:
+Set Webhook address user rake command:
 
 > rake bot:set_webhook
