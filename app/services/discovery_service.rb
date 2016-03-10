@@ -59,7 +59,7 @@ class DiscoveryService
     @url != false
   end
 
-  private
+  # private
 
   def feed?(url)
     Feedjira::Feed.fetch_and_parse(url)
@@ -113,6 +113,13 @@ class DiscoveryService
          CONTENT_TYPES.include?(l['type'].downcase.strip) &&
          (l['rel'].downcase =~ /alternate/i || l['rel'] == 'service.feed')
         add_feed(l['href'], @url, @base_uri)
+      end
+    end
+
+    (doc/'a').each do |a|
+      if a['href'] &&
+         a['href'].include?('.feedburner.com')
+        add_feed(a['href'], @url, @base_uri)
       end
     end
   end
