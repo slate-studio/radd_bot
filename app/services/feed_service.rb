@@ -15,12 +15,10 @@ class FeedService
     rescue Feedjira::NoParserAvailable
       ap 'No valid parser for XML for:'
       ap f.url
-      next
 
     rescue Faraday::TimeoutError
       ap 'Wops, timeout happened for:'
       ap f.url
-      next
 
     end
 
