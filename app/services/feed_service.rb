@@ -44,7 +44,7 @@ class FeedService
 
   def pull_and_send!
     Feed.all.each do |f|
-      Resque.enqueue(FeedJob, f.id)
+      Resque.enqueue(FeedJob, f.id.to_s)
     end
   end
 end
