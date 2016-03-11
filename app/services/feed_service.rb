@@ -51,5 +51,6 @@ class FeedService
       ap f.url
       Resque.enqueue(FeedJob, f.id.to_s)
     end
+    true
   end
 end
