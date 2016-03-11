@@ -5,39 +5,48 @@ class FeedService
     @telegram = TelegramService.new
   end
 
-  # TODO: with lots of feeds > 5k this class should be optimized
-  def pull_and_send!
-    Feed.all.each do |f|
-      url = f.url
+  def pull_and_send_feed(feed_id)
+    f   = Feed.find(feed_id)
+    url = f.url
 
-      begin
-        ff = Feedjira::Feed.fetch_and_parse(url)
+    begin
+      ff = Feedjira::Feed.fetch_and_parse(url)
 
-      rescue Feedjira::NoParserAvailable
-        ap 'No valid parser for XML.'
-        ap f.url
-        next
+    rescue Feedjira::NoParserAvailable
+      ap 'No valid parser for XML for:'
+      ap f.url
+      next
 
-      end
+    rescue Faraday::TimeoutError
+      ap 'Wops, timeout happened for:'
+      ap f.url
+      next
 
-      new_posts = ff.entries.select do |e|
-        e.published > f.updated_at
-      end
+    end
 
-      if ! new_posts.empty?
-        user_ids     = f.subscribers.map { |s| s.user_id }
-        sorted_posts = new_posts.map { |p| [p.published, p.url] }
-        sorted_posts.sort!
+    new_posts = ff.entries.select do |e|
+      e.published > f.updated_at
+    end
 
-        user_ids.each do |user_id|
-          sorted_posts.each do |sp|
-            url = sp[1]
-            @telegram.send_silent_message(user_id, url)
-          end
+    if ! new_posts.empty?
+      user_ids     = f.subscribers.map { |s| s.user_id }
+      sorted_posts = new_posts.map { |p| [p.published, p.url] }
+      sorted_posts.sort!
+
+      user_ids.each do |user_id|
+        sorted_posts.each do |sp|
+          url = sp[1]
+          @telegram.send_silent_message(user_id, url)
         end
       end
+    end
 
-      f.touch
+    f.touch
+  end
+
+  def pull_and_send!
+    Feed.all.each do |f|
+      Resque.enqueue(FeedJob, f.id)
     end
   end
 end
