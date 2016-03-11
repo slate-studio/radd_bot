@@ -16,9 +16,13 @@ class FeedService
       ap 'No valid parser for XML for:'
       ap f.url
 
+      return
+
     rescue Faraday::TimeoutError
       ap 'Wops, timeout happened for:'
       ap f.url
+
+      return
 
     end
 
