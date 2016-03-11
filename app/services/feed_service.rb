@@ -46,8 +46,9 @@ class FeedService
     f.touch
   end
 
-  def pull_and_send!
+  def create_pull_jobs!
     Feed.all.each do |f|
+      ap f.url
       Resque.enqueue(FeedJob, f.id.to_s)
     end
   end
