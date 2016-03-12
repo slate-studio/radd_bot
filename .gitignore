@@ -14,3 +14,4 @@
 .env
 config/YOURPRIVATE.key
 config/YOURPUPBLIC.pem
+dump.rdb

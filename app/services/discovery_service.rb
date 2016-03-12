@@ -46,20 +46,14 @@ class DiscoveryService
       end
 
       try_variants!
-
-      if valid_url?
-        parse_feeds
-      end
-
-      # TODO: verify feeds are valid
+      parse_feeds!
+      drop_feeds_with_comments!
     end
   end
 
   def valid_url?
     @url != false
   end
-
-  # private
 
   def feed?(url)
     Feedjira::Feed.fetch_and_parse(url)
@@ -75,7 +69,7 @@ class DiscoveryService
   def try_variants!
     @variants.each do |v|
       @url     = v
-      @response = open_url
+      @response = open_url(@url)
       if @response
         return
       end
@@ -83,13 +77,17 @@ class DiscoveryService
     @url = false
   end
 
-  def open_url
-    open(@url)
+  def open_url(url)
+    open(url)
   rescue
     false
   end
 
-  def parse_feeds
+  def parse_feeds!
+    if ! valid_url?
+      return
+    end
+
     @feeds = []
 
     if doc.at('base') and doc.at('base')['href']
@@ -145,6 +143,12 @@ class DiscoveryService
 
     if ! @feeds.include?(url)
       @feeds << url
+    end
+  end
+
+  def drop_feeds_with_comments!
+    if @feeds
+      @feeds.select! { |url| ! url.include?('/comments/') }
     end
   end
 end

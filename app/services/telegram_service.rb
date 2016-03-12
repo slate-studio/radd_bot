@@ -26,6 +26,10 @@ class TelegramService
     call('sendMessage', { chat_id: chat_id, text: text })
   end
 
+  def send_message_without_preview(chat_id, text)
+    call('sendMessage', { chat_id: chat_id, text: text, disable_web_page_preview: true })
+  end
+
   def send_silent_message(chat_id, text)
     call('sendMessage', { chat_id: chat_id, text: text, disable_notification: true })
   end
@@ -63,6 +67,7 @@ class TelegramService
   def call(endpoint, params = {})
     response = self.class.post("/bot#{token}/#{endpoint}", query: params)
 
+    ap 'OUT:'
     ap response
 
     if response.code == 200

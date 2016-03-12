@@ -1,8 +1,11 @@
 class TelegramController < ActionController::Base
   def receive
-    message = params[:telegram]
-    InteractionService.process(message)
+    msg_object = params[:telegram]
 
+    ap 'IN:'
+    ap msg_object
+
+    InteractionService.new(msg_object)
     render nothing: true
   end
 end
