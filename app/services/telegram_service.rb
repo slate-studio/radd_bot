@@ -73,7 +73,7 @@ class TelegramService
     if response.code == 200
       response.to_hash
 
-    if response.code == 403
+    elsif response.code == 403
       raise Exceptions::ForbiddenError.new(response),
         'Bot was blocked by the user.'
 
@@ -116,7 +116,6 @@ class TelegramService
       end
     end
 
-    class ForbiddenError < ResponseError
-    end
+    class ForbiddenError < ResponseError; end
   end
 end
