@@ -9,7 +9,7 @@ class TelegramService
     # https://core.telegram.org/bots#3-how-do-i-create-a-bot
     @token = ENV['TELEGRAM_BOT_API_TOKEN']
     # https://core.telegram.org/bots/self-signed
-    @certificate_path = Rails.root.join('config', 'YOURPUBLIC.pem')
+    # @certificate_path = Rails.root.join('config', 'YOURPUBLIC.pem')
   end
 
   # https://core.telegram.org/bots/api#setwebhook
@@ -72,9 +72,15 @@ class TelegramService
 
     if response.code == 200
       response.to_hash
+
+    if response.code == 403
+      raise Exceptions::ForbiddenError.new(response),
+        'Bot was blocked by the user.'
+
     else
       fail Exceptions::ResponseError.new(response),
-           'Telegram API has returned the error.'
+        'Telegram API has returned the error.'
+
     end
   end
 
@@ -108,6 +114,9 @@ class TelegramService
           { error_code: response.code, uri: response.request.last_uri.to_s }
         end
       end
+    end
+
+    class ForbiddenError < ResponseError
     end
   end
 end

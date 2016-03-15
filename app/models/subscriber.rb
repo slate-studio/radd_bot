@@ -35,4 +35,8 @@ class Subscriber
 
     subscriber
   end
+
+  def self.destroy_if_exists(user_id)
+    where(user_id: user_id).first.try(:destroy)
+  end
 end

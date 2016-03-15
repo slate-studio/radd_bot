@@ -1,8 +1,8 @@
 class FeedService
-  attr_reader :telegram
+  attr_reader :bot
 
   def initialize
-    @telegram = TelegramService.new
+    @bot = TelegramService.new
   end
 
   def pull_and_send_feed(feed_id)
@@ -30,20 +30,37 @@ class FeedService
       e.published > f.updated_at
     end
 
+    sorted_posts = []
     if ! new_posts.empty?
-      user_ids     = f.subscribers.map { |s| s.user_id }
       sorted_posts = new_posts.map { |p| [p.published, p.url] }
       sorted_posts.sort!
-
-      user_ids.each do |user_id|
-        sorted_posts.each do |sp|
-          url = sp[1]
-          @telegram.send_silent_message(user_id, url)
-        end
-      end
     end
 
     f.touch
+
+    if ! sorted_posts.empty?
+      user_ids = f.subscribers.map { |s| s.user_id }
+      user_ids.each do |user_id|
+        sorted_posts.each do |sp|
+          url = sp[1]
+          send_notification(user_id, url)
+        end
+      end
+    end
+  end
+
+  def send_notification(user_id, text, counter=0)
+    @bot.send_silent_message(user_id, url)
+
+  rescue TelegramService::Exceptions::ResponseError
+    ap "Destroy user: #{user_id}"
+    Subscriber.destroy_if_exists(user_id)
+
+  rescue Net::ReadTimeout
+    if counter < 3
+      send_notification(user_id, text, counter + 1)
+    end
+
   end
 
   def create_pull_jobs!
