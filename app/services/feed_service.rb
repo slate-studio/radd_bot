@@ -43,6 +43,7 @@ class FeedService
       user_ids.each do |user_id|
         sorted_posts.each do |sp|
           url = sp[1]
+          ap "Send notification for #{user_id}: #{url}"
           send_notification(user_id, url)
         end
       end
@@ -50,7 +51,7 @@ class FeedService
   end
 
   def send_notification(user_id, text, counter=0)
-    @bot.send_silent_message(user_id, url)
+    @bot.send_silent_message(user_id, text)
 
   rescue TelegramService::Exceptions::ResponseError
     ap "Destroy user: #{user_id}"
