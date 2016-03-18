@@ -19,6 +19,10 @@ class InteractionService
     @user_id = @user.user_id
     @text    = message[:text]
 
+    if @text.nil?
+      return
+    end
+
     @telegram.send_chat_action(@user_id, 'typing')
 
     if @text.start_with? '/start'

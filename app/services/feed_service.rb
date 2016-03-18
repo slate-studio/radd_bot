@@ -66,6 +66,7 @@ class FeedService
 
   def create_pull_jobs!
     Feed.all.each do |f|
+      # TODO: add subscribers check
       ap f.url
       Resque.enqueue(FeedJob, f.id.to_s)
     end
