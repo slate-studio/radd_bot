@@ -15,15 +15,22 @@ class FeedService
     rescue Feedjira::NoParserAvailable
       ap 'No valid parser for XML for:'
       ap f.url
+      return
 
+    rescue Faraday::ConnectionFailed
+      ap 'Connection error:'
+      ap f.url
+      return
+
+    rescue Feedjira::FetchFailure
+      ap 'RSS feed application error:'
+      ap f.url
       return
 
     rescue Faraday::TimeoutError
-      ap 'Wops, timeout happened for:'
+      ap 'Wops, timeout error:'
       ap f.url
-
       return
-
     end
 
     new_posts = ff.entries.select do |e|
@@ -66,9 +73,10 @@ class FeedService
 
   def create_pull_jobs!
     Feed.all.each do |f|
-      # TODO: add subscribers check
-      ap f.url
-      Resque.enqueue(FeedJob, f.id.to_s)
+      if f.subscribers.size > 0
+        ap f.url
+        Resque.enqueue(FeedJob, f.id.to_s)
+      end
     end
     true
   end
