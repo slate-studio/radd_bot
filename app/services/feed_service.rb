@@ -34,7 +34,7 @@ class FeedService
     end
 
     new_posts = ff.entries.select do |e|
-      e.published > f.updated_at
+      e.published.in_time_zone > f.updated_at.in_time_zone
     end
 
     sorted_posts = []
