@@ -1,4 +1,4 @@
-# Radd Telegram Bot
+# Radd Bot
 
 ## Development
 
