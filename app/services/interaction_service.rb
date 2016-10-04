@@ -14,7 +14,7 @@ class InteractionService
   def initialize(msg_object)
     @telegram = TelegramService.new
 
-    message  = msg_object[:message]
+    message  = msg_object[:message] || msg_object[:edited_message]
     @user    = Subscriber.find_or_create_by_message(message)
     @user_id = @user.user_id
     @text    = message[:text]
