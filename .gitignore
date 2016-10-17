@@ -15,3 +15,5 @@
 config/YOURPRIVATE.key
 config/YOURPUPBLIC.pem
 dump.rdb
+
+.DS_Store
